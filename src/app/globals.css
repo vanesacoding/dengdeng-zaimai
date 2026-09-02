@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #f7f4ec; --paper: #fffcf6; --forest: #41644a; --forest-deep: #294a34;
+  --sage: #86a889; --sage-soft: #e7f0e5; --orange: #e9965b; --orange-soft: #fff0e3;
+  --ink: #252923; --muted: #6f756d; --line: #e5e1d7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cream); color: var(--ink); font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif; }
+button, input, textarea, select { font: inherit; }
+.safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
