@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, Clock3, HeartHandshake, Pencil, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InstallPrompt } from "@/components/install-prompt";
 
 const steps: { icon: LucideIcon; title: string; desc: string; bg: string }[] = [
   { icon: Pencil, title: "写下想买的", desc: "物品、价格、理由——越具体越清醒", bg: "var(--sage-soft)" },
@@ -28,7 +29,7 @@ export default function Landing() {
             写下为什么想买，请信任的朋友帮你看一眼。不是管住你，而是陪你做一个更清醒的决定。
           </p>
           <div className="mt-9 flex gap-3">
-            <Button asChild><Link href="/app">体验演示 <ArrowRight size={17}/></Link></Button>
+            <Button asChild><Link href="/demo">体验演示 <ArrowRight size={17}/></Link></Button>
             <Button variant="outline" asChild><Link href="/login">登录</Link></Button>
           </div>
           <div className="mt-10 flex flex-wrap gap-5 text-sm text-[var(--muted)]">
@@ -66,6 +67,9 @@ export default function Landing() {
           })}
         </div>
       </section>
+
+      {/* Install prompt banner — shows on first visit */}
+      <InstallPrompt/>
     </main>
   );
 }
