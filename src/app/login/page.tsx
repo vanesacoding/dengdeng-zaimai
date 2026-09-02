@@ -80,7 +80,7 @@ export default function Login() {
       const current = relation;
       if (!current) return;
       const changed =
-        (lp.invitee_id !== current.invitee_id) ||
+        (lp.inviteeId !== current.invitee_id) ||
         (lp.status !== current.status);
       if (changed) {
         setRelation({

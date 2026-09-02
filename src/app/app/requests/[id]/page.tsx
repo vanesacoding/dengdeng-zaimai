@@ -36,6 +36,7 @@ export default function Detail() {
   }
 
   function handleDelete() {
+    if (!r) return;
     remove(r.id);
     router.push("/app/requests");
   }
@@ -109,7 +110,7 @@ export default function Detail() {
             <p className="text-sm font-semibold text-red-700">确定要删除这条记录吗？</p>
             <p className="mt-1 text-xs text-red-600">删除后无法恢复</p>
             <div className="mt-3 flex gap-3">
-              <Button variant="destructive" className="flex-1" onClick={handleDelete}>
+              <Button variant="danger" className="flex-1" onClick={handleDelete}>
                 <Trash2 size={16}/> 确认删除
               </Button>
               <Button variant="outline" className="flex-1" onClick={() => setShowDeleteConfirm(false)}>
