@@ -18,6 +18,7 @@
     "@supabase/supabase-js": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
+    "html-to-image": "^1.11.13",
     "lucide-react": "latest",
     "next": "latest",
     "openai": "latest",
