@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, ChevronDown, ChevronRight, Clock3, Flame, Heart, MessageCircle, Plus, Sparkles, WalletCards } from "lucide-react";
+import { Bell, ChevronDown, ChevronRight, Clock3, Heart, MessageCircle, Plus, Sparkles, WalletCards } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { demoBudget, demoRequests } from "@/lib/mock-data";
 import { formatMoney } from "@/lib/utils";
@@ -189,10 +189,14 @@ export default function Dashboard() {
       </Card>
     </section>
 
-    {/* 逛逛入口 */}
-    <Link href="/app/explore" className="mt-7 flex min-h-14 items-center justify-between rounded-[24px] border border-dashed border-[var(--sage)] bg-white/60 px-4">
-      <span className="flex items-center gap-2 font-semibold"><Flame size={18} className="text-[var(--orange)]"/>去看看大家都在纠结什么</span>
-      <ChevronRight size={18}/>
+    {/* 等等法庭引流 */}
+    <Link href="/app/explore" className="mt-7 block rounded-[24px] border-2 border-[var(--lemon)] bg-[var(--lemon-soft)] p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold text-[var(--orange-deep)]">⚖️ 等等法庭今日热案</p>
+        <span className="text-xs text-[var(--muted)]">18 个姐妹等你参谋 →</span>
+      </div>
+      <p className="mt-2 text-sm font-bold leading-6 text-[var(--ink)]">《关于我试图用买东西改变人生的申请》</p>
+      <p className="mt-1 text-xs text-[var(--muted)]">陪审团当前判决：先去楼下跑七天</p>
     </Link>
   </>;
 }

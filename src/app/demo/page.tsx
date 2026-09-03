@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowRight, Check, Clock3, Compass, HeartHandshake,
+  ArrowRight, Check, Clock3, Scale, HeartHandshake,
   Pencil, Sparkles, X, type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,10 +51,10 @@ export default function Demo() {
       mock: <DemoDecisionCard/>,
     },
     {
-      icon: Compass,
-      title: "逛逛大家都在纠结什么",
-      desc: "在广场围观真实的心动和拔草，也许你并不孤单",
-      bg: "var(--blue-soft)",
+      icon: Scale,
+      title: "开庭围观离谱购物案",
+      desc: "在等等法庭看搞笑购物理由，帮陌生姐妹审核，等案件反转",
+      bg: "var(--lemon-soft)",
       mock: <DemoExploreCard/>,
     },
   ];
@@ -106,7 +106,7 @@ export default function Demo() {
         {isLast ? (
           <div className="space-y-3">
             <p className="text-center text-sm text-[var(--muted)]">
-              准备好和闺蜜一起，让每一次心动都更有陪伴感了吗？
+              准备好和闺蜜一起，让每一次心动都更有陪伴感了吗？法庭等你开庭。
             </p>
             <Button asChild className="h-14 w-full">
               <Link href="/login">
@@ -213,7 +213,7 @@ function DemoDecisionCard() {
           <p className="text-xs text-[var(--muted)]">实际 ¥820</p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-[var(--muted)]">记录会同步给帮你参谋的闺蜜，也可以发到广场</p>
+      <p className="mt-3 text-xs text-[var(--muted)]">记录会同步给帮你参谋的闺蜜，也可以发到等等法庭</p>
     </div>
   );
 }
@@ -221,40 +221,45 @@ function DemoDecisionCard() {
 function DemoExploreCard() {
   return (
     <div className="space-y-3">
-      <div className="rounded-3xl border border-[var(--line)] bg-[var(--paper)] p-4 text-left shadow-sm">
-        <div className="flex items-center gap-3">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f3e9df] text-3xl">📷</span>
+      <div className="rounded-3xl border-2 border-[var(--lemon)] bg-[var(--lemon-soft)] p-4 text-left shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="rounded-full bg-[var(--ink)] px-2.5 py-1 text-xs font-bold text-white">第 0826 号购物案</span>
+          <span className="rounded-full bg-[var(--cream)] px-2 py-1 text-xs text-[var(--muted)]">🗳️ 陪审团投票中</span>
+        </div>
+        <p className="mt-2 text-sm font-bold leading-6 text-[var(--ink)]">《关于我试图用买东西改变人生的申请》</p>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--blue-soft)] text-2xl">🥤</span>
           <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <b className="text-sm">便携照片打印机</b>
-              <b className="text-sm">¥699</b>
-            </div>
-            <p className="mt-0.5 text-xs text-[var(--muted)]">晚风 · 纠结 7 天</p>
+            <b className="text-sm">智能水杯</b>
+            <b className="float-right text-sm">¥799</b>
           </div>
         </div>
-        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">想把旅行照片打印出来做手账，但担心买回来吃灰……</p>
-        <div className="mt-3 flex gap-3 border-t border-[var(--line)] pt-2 text-xs">
-          <span className="flex items-center gap-1 text-[var(--forest)]">👍 值得买 26</span>
-          <span className="flex items-center gap-1 text-[var(--muted)]">🤝 我也想买 12</span>
-          <span className="flex items-center gap-1 text-[var(--muted)]">💬 8</span>
+        <div className="mt-2 flex items-center gap-2 text-xs text-[var(--muted)]">
+          <span className="text-[var(--forest)] font-semibold">18% 批准</span>
+          <span>·</span>
+          <span className="text-[var(--orange)] font-semibold">54% 冷静</span>
+          <span>·</span>
+          <span className="text-red-400 font-semibold">28% 驳回</span>
         </div>
+        <p className="mt-2 text-xs text-[var(--orange-deep)] font-semibold">⚖️ 判处冷静 72 小时</p>
       </div>
       <div className="rounded-3xl border border-[var(--line)] bg-[var(--paper)] p-4 text-left shadow-sm">
-        <div className="flex items-center gap-3">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[var(--blue-soft)] text-3xl">☕</span>
+        <div className="flex items-center justify-between">
+          <span className="rounded-full bg-[var(--ink)] px-2.5 py-1 text-xs font-bold text-white">第 0488 号购物案</span>
+          <span className="rounded-full bg-[var(--sage-soft)] px-2 py-1 text-xs text-[var(--forest)]">📁 已结案</span>
+        </div>
+        <p className="mt-2 text-sm font-bold leading-6 text-[var(--ink)]">《我的闺蜜劝我别买，所以申请社会评议》</p>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--orange-soft)] text-2xl">🎧</span>
           <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <b className="text-sm">奶油白咖啡机</b>
-              <b className="text-sm">¥1299</b>
-            </div>
-            <p className="mt-0.5 text-xs text-[var(--muted)]">栗子 · 成功拔草</p>
+            <b className="text-sm">降噪耳机</b>
+            <b className="float-right text-sm">¥1,899</b>
           </div>
         </div>
-        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">冷静三天后发现我真正想要的是每天早点睡，不是咖啡机。</p>
-        <div className="mt-3 flex gap-3 border-t border-[var(--line)] pt-2 text-xs">
-          <span className="flex items-center gap-1 text-[var(--forest)]">🌿 成功拔草 88</span>
-          <span className="flex items-center gap-1 text-[var(--muted)]">🤝 我也想买 5</span>
-          <span className="flex items-center gap-1 text-[var(--muted)]">💬 20</span>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          <span className="rounded-full bg-[var(--sage-soft)] px-2 py-0.5 text-xs text-[var(--forest)]">买了真香</span>
+          <span className="rounded-full bg-[var(--lemon-soft)] px-2 py-0.5 text-xs font-bold text-[var(--orange-deep)]">🔄 陪审团猜错了</span>
+          <span className="rounded-full bg-[var(--blue-soft)] px-2 py-0.5 text-xs text-[var(--forest-deep)]">本案有后续</span>
         </div>
       </div>
     </div>

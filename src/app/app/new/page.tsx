@@ -6,7 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, ArrowRight, ChevronDown, ImagePlus, Link2, Send, Sparkles } from "lucide-react";
-import { friendlyRiskLabel, moodLabel, moods, purchaseSchema, visibilityLabel, visibilities } from "@/lib/domain";
+import { friendlyRiskLabel, generateTitleCandidates, isSafeTitle, moodLabel, moods, purchaseSchema, visibilityLabel, visibilities } from "@/lib/domain";
 import { calculateRisk } from "@/lib/risk";
 import { demoBudget } from "@/lib/mock-data";
 import { formatMoney, yuanToCents } from "@/lib/utils";
@@ -24,6 +24,10 @@ function generateRequestId(): string {
 export default function NewRequest() {
   const [step, setStep] = useState(0);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [caseTitle, setCaseTitle] = useState("");
+  const [caseReason, setCaseReason] = useState("");
+  const [allowAnonymous, setAllowAnonymous] = useState(false);
+  const [titleError, setTitleError] = useState("");
   const router = useRouter();
   const { add } = useRequests();
   const { register, control, handleSubmit, trigger, formState:{ errors } } = useForm<Form>({
@@ -39,10 +43,18 @@ export default function NewRequest() {
   }
 
   function submit(data: Form) {
+    if (data.visibility === "PUBLIC" && caseTitle && !isSafeTitle(caseTitle)) {
+      setTitleError("案件标题包含不友善内容，请修改");
+      setStep(1);
+      return;
+    }
     const id = generateRequestId();
     add({ id, itemName:data.itemName, priceCents:yuanToCents(Number(data.priceYuan)), category:data.category, reason:data.reason, status:"PENDING_APPROVAL", riskScore:risk.score, createdAt:"刚刚", reviewer:"闺蜜", mood:data.mood, visibility:data.visibility, productUrl:data.productUrl || undefined, imageUrl:data.imageUrl || undefined });
     router.push("/app/requests/submitted");
   }
+
+  const titleCandidates = generateTitleCandidates(String(value.reason || ""), !!value.hasSimilarItem, !!value.limitedPromotion, String(value.category || ""));
+  const isPublic = value.visibility === "PUBLIC";
 
   return <>
     <header className="flex items-center gap-3"><Button variant="ghost" size="icon" aria-label="返回" onClick={()=>step ? setStep(0) : router.back()}><ArrowLeft/></Button><div><p className="text-xs text-[var(--muted)]">{step === 0 ? "先记下这次心动" : "喊谁来参谋？"}</p><h1 className="text-2xl font-black">{step === 0 ? "我想买这个" : "发出去前看一眼"}</h1></div></header>
@@ -62,9 +74,30 @@ export default function NewRequest() {
       {step === 1 && <div className="space-y-5">
         <Card className="border-0 bg-[var(--sage-soft)] p-5"><div className="flex items-start justify-between gap-4"><div><span className="mood-chip">{value.mood ? moodLabel[value.mood] : "突然心动"}</span><h2 className="mt-3 text-xl font-black">{String(value.itemName || "还没起名字")}</h2><p className="mt-1 text-sm text-[var(--muted)]">{String(value.reason || "还没写心动理由")}</p></div><b className="text-xl">{formatMoney(priceCents)}</b></div></Card>
         <Card><div className="flex items-center gap-2"><Sparkles size={18} className="text-[var(--orange)]"/><h2 className="font-bold">上头小提示</h2></div><p className="mt-3 text-xl font-black">{friendlyRiskLabel(risk.score)}</p><div className="mt-4 grid grid-cols-2 gap-3 text-sm"><div className="rounded-2xl bg-[var(--cream)] p-3"><p className="text-[var(--muted)]">买完还剩</p><b>{formatMoney(demoBudget.remainingAmount-priceCents)}</b></div><div className="rounded-2xl bg-[var(--cream)] p-3"><p className="text-[var(--muted)]">占剩余预算</p><b>{Math.round(risk.ratio*100)}%</b></div></div><details className="mt-4 text-sm text-[var(--muted)]"><summary className="cursor-pointer py-2">为什么这样提示？</summary><ul className="mt-2 space-y-1">{risk.reasons.length ? risk.reasons.map(reason=><li key={reason}>• {reason}</li>) : <li>暂时没有明显的上头信号。</li>}<li>• 详细参考分：{risk.score}/100</li></ul></details><p className="mt-3 rounded-2xl bg-[var(--lemon-soft)] p-3 text-sm">这些只是提示，决定权一直在你。</p></Card>
-        <Field label="给谁看？"><div className="space-y-2">{visibilities.map(visibility=><label key={visibility} className="flex min-h-14 items-center gap-3 rounded-2xl border border-[var(--line)] bg-white px-4"><input type="radio" value={visibility} {...register("visibility")} className="size-5 accent-[var(--forest)]"/><span><b className="block text-sm">{visibilityLabel[visibility]}</b><small className="text-[var(--muted)]">{visibility === "FRIENDS" ? "让闺蜜第一时间来参谋" : visibility === "PUBLIC" ? "公开区暂为体验入口" : "先留给自己慢慢想"}</small></span></label>)}</div></Field>
+        <Field label="给谁看？"><div className="space-y-2">{visibilities.map(visibility=><label key={visibility} className="flex min-h-14 items-center gap-3 rounded-2xl border border-[var(--line)] bg-white px-4"><input type="radio" value={visibility} {...register("visibility")} className="size-5 accent-[var(--forest)]"/><span><b className="block text-sm">{visibilityLabel[visibility]}</b><small className="text-[var(--muted)]">{visibility === "FRIENDS" ? "让闺蜜第一时间来参谋" : visibility === "PUBLIC" ? "发到等等法庭，公开审理" : "先留给自己慢慢想"}</small></span></label>)}</div></Field>
+
+        {/* Case packaging step — only for PUBLIC */}
+        {isPublic && (
+          <Card className="space-y-4 border-2 border-[var(--lemon)] bg-[var(--lemon-soft)] p-4">
+            <div>
+              <p className="text-xs font-bold text-[var(--orange-deep)]">⚖️ 包装成购物案</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">公开发布会进入等等法庭，填写案件信息让陪审团更好参谋</p>
+            </div>
+            <Field label="案件标题" error={titleError || undefined}>
+              <div className="space-y-2">
+                {titleCandidates.map(tmpl => (
+                  <button type="button" key={tmpl} onClick={() => { setCaseTitle(tmpl); setTitleError(""); }} className={`flex min-h-11 w-full items-center rounded-2xl border px-3 text-left text-sm transition ${caseTitle === tmpl ? "border-[var(--forest)] bg-[var(--sage-soft)] font-semibold text-[var(--forest)]" : "border-[var(--line)] bg-white text-[var(--muted)]"}`}>{tmpl}</button>
+                ))}
+                <Input value={caseTitle} onChange={e => { setCaseTitle(e.target.value); setTitleError(""); }} placeholder="或者自己写一个案名……" />
+                <button type="button" onClick={() => setCaseTitle("")} className="text-xs text-[var(--muted)]">跳过搞笑标题</button>
+              </div>
+            </Field>
+            <Field label="案由（选填）" hint="一句话概括这次购物申请"><Input value={caseReason} onChange={e => setCaseReason(e.target.value)} placeholder="例如：想用买东西改变生活习惯"/></Field>
+            <label className="flex min-h-12 items-center gap-3 rounded-2xl bg-white px-4"><input type="checkbox" checked={allowAnonymous} onChange={e => setAllowAnonymous(e.target.checked)} className="size-5 accent-[var(--forest)]"/><span className="text-sm">匿名发布</span></label>
+          </Card>
+        )}
         <div className="grid grid-cols-2 gap-3"><Field label="放进冷静盒"><label className="flex min-h-12 items-center gap-3 rounded-2xl bg-white px-4"><input {...register("coolingEnabled")} type="checkbox" className="size-5 accent-[var(--forest)]"/><span className="text-sm">需要</span></label></Field><Field label="冷静多久"><Input {...register("coolingHours")} type="number" inputMode="numeric"/></Field></div>
-        <Button type="submit" className="min-h-14 w-full text-base"><Send/>喊闺蜜来参谋</Button>
+        <Button type="submit" className="min-h-14 w-full text-base"><Send/>{isPublic ? "递交购物案" : "喊闺蜜来参谋"}</Button>
         <button type="button" onClick={()=>setStep(0)} className="min-h-12 w-full text-sm text-[var(--muted)]">返回修改</button>
       </div>}
     </form>

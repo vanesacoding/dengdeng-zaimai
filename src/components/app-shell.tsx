@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/app", label: "首页", icon: Home },
-  { href: "/app/explore", label: "逛逛", icon: Compass },
+  { href: "/app/explore", label: "开庭", icon: Compass },
   { href: "/app/new", label: "想买", icon: Plus, main: true },
   { href: "/app/notifications", label: "消息", icon: MessageCircle },
   { href: "/app/settings", label: "我的", icon: UserRound },
