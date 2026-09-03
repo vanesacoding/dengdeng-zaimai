@@ -46,13 +46,16 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [isLocalMode, setIsLocalMode] = useState(false);
   const router = useRouter();
-  const relationId = relation?.id;
   const relationStatus = relation?.status;
 
   // Restore local session on mount
   useEffect(() => {
     const u = getLocalUser();
-    if (u) { setNickname(u.nickname); setUserId(u.id); }
+    if (u) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNickname(u.nickname);
+      setUserId(u.id);
+    }
     // Also check if there's an existing local pairing to resume
     const lp = getLocalPairing();
     if (lp && u) {
@@ -231,7 +234,7 @@ export default function Login() {
         <h1 className="mt-6 text-3xl font-bold">{active ? "你们已经绑定好啦" : friendArrived ? "朋友已经找到你" : "正在等待朋友"}</h1>
         <p className="mt-3 leading-7 text-[var(--muted)]">
           {active
-            ? "以后可以互相提交购买申请，也可以随时解除关系。"
+            ? "以后可以互相晒想买、帮忙参谋，也可以随时退出闺蜜房。"
             : isCreator
               ? friendArrived
                 ? `确认这是${friendName}后，就可以开始互相陪伴。`

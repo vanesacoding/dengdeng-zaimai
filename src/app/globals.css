@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --cream: #f7f4ec; --paper: #fffcf6; --forest: #41644a; --forest-deep: #294a34;
-  --sage: #86a889; --sage-soft: #e7f0e5; --orange: #e9965b; --orange-soft: #fff0e3;
-  --ink: #252923; --muted: #6f756d; --line: #e5e1d7;
+  --cream: #faf7f1; --paper: #fffdf9; --forest: #4f7559; --forest-deep: #31503a;
+  --sage: #8eaa91; --sage-soft: #e9f1e8; --orange: #f29a62; --orange-deep: #9b4d20; --orange-soft: #fff0e6;
+  --lemon: #f4d66d; --lemon-soft: #fff7d7; --blue: #afc9d6; --blue-soft: #eaf3f7;
+  --ink: #20251f; --muted: #71786f; --line: #e6e1d8;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--cream); color: var(--ink); font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif; }
 button, input, textarea, select { font: inherit; }
 .safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+.mood-chip { display:inline-flex; max-width:8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:999px; background:var(--lemon-soft); padding:.2rem .55rem; color:#67560f; font-size:.68rem; font-weight:600; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; animation-iteration-count:1!important; } }

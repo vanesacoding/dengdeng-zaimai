@@ -192,8 +192,8 @@ function DemoDecisionCard() {
       <div className="mt-4 flex gap-3">
         <div className="flex-1 rounded-2xl border-2 border-[var(--forest)] bg-[var(--sage-soft)] p-3">
           <Check className="mx-auto text-[var(--forest)]"/>
-          <p className="mt-1 text-sm font-semibold text-[var(--forest)]">决定不买</p>
-          <p className="text-xs text-[var(--muted)]">守住了 ¥899</p>
+          <p className="mt-1 text-sm font-semibold text-[var(--forest)]">成功拔草</p>
+          <p className="text-xs text-[var(--muted)]">¥899 留在了口袋里</p>
         </div>
         <div className="flex-1 rounded-2xl border border-[var(--line)] bg-white p-3">
           <p className="mt-1 text-sm font-semibold text-[var(--muted)]">已购买</p>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { demoRequests } from "./mock-data";
-import type { RequestStatus } from "./domain";
+import { normalizeRequest, type RequestStatus } from "./domain";
+import type { PurchaseMood, RequestVisibility } from "./domain";
 
 export interface PurchaseRequest {
   id: string;
@@ -14,6 +15,10 @@ export interface PurchaseRequest {
   riskScore: number;
   createdAt: string;
   reviewer: string;
+  mood?: PurchaseMood;
+  visibility?: RequestVisibility;
+  productUrl?: string;
+  imageUrl?: string;
 }
 
 const STORAGE_KEY = "ddzm:requests";
@@ -21,7 +26,24 @@ const STORAGE_KEY = "ddzm:requests";
 function load(): PurchaseRequest[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>[];
+      // Ensure old records without mood/visibility don't crash
+      return parsed.map(r => ({
+        id: String(r.id ?? ""),
+        itemName: String(r.itemName ?? ""),
+        priceCents: Number(r.priceCents ?? 0),
+        category: String(r.category ?? ""),
+        reason: String(r.reason ?? ""),
+        status: r.status as RequestStatus,
+        riskScore: Number(r.riskScore ?? 0),
+        createdAt: String(r.createdAt ?? ""),
+        reviewer: String(r.reviewer ?? ""),
+        productUrl: r.productUrl ? String(r.productUrl) : undefined,
+        imageUrl: r.imageUrl ? String(r.imageUrl) : undefined,
+        ...normalizeRequest(r),
+      })) as PurchaseRequest[];
+    }
   } catch {}
   return [...demoRequests];
 }
@@ -37,6 +59,7 @@ export function useRequests() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRequests(load());
     setReady(true);
   }, []);
@@ -57,5 +80,13 @@ export function useRequests() {
     });
   }, []);
 
-  return { requests, remove, add, ready };
+  const update = useCallback((id: string, patch: Partial<PurchaseRequest>) => {
+    setRequests(prev => {
+      const next = prev.map(r => (r.id === id ? { ...r, ...patch } : r));
+      save(next);
+      return next;
+    });
+  }, []);
+
+  return { requests, remove, add, update, ready };
 }

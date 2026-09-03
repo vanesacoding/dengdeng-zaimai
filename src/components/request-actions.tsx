@@ -55,7 +55,7 @@ export function RequestActions({ priceCents }: { priceCents: number }) {
             <Check size={20}/>
           </span>
           <div>
-            <b>已记录：决定不买</b>
+            <b>已记录：成功拔草</b>
             <p className="text-sm text-[var(--muted)]">守住了 {formatMoney(priceCents)}，给自己点个赞。</p>
           </div>
         </div>
@@ -69,7 +69,7 @@ export function RequestActions({ priceCents }: { priceCents: number }) {
   return (
     <div className="mt-5 flex gap-3">
       <Button variant="outline" className="flex-1" onClick={() => setResult("GIVEN_UP")}>
-        <X/> 决定不买
+        <X/> 成功拔草
       </Button>
       <Button className="flex-1" onClick={() => setResult("PURCHASED")}>
         <ShieldCheck/> 记录结果

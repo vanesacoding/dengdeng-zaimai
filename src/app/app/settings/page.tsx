@@ -18,7 +18,7 @@ export default function Settings() {
     </div>
     <div className="mt-7 space-y-3">
       <Item href="/app/budget" icon={<PieChart/>} title="月度预算" text="本月剩余 ¥1,860"/>
-      <Item href="/app/relationship" icon={<HeartHandshake/>} title="监督关系" text="搭子 · 双方已确认"/>
+      <Item href="/app/relationship" icon={<HeartHandshake/>} title="我的闺蜜房" text="小满 · 已经一起 7 天"/>
       <Item href="/app/insights" icon={<Shield/>} title="月度复盘" text="查看消费模式"/>
       <Item href="/app/settings/privacy" icon={<UserRound/>} title="隐私与账户" text="数据权限、退出登录"/>
     </div>

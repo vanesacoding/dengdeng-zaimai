@@ -14,7 +14,10 @@ export function useLocalUser() {
       const raw = localStorage.getItem("ddzm:user");
       if (raw) {
         const user = JSON.parse(raw);
-        if (user?.nickname) setNickname(user.nickname);
+        if (user?.nickname) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setNickname(user.nickname);
+        }
       }
     } catch {
       /* ignore */

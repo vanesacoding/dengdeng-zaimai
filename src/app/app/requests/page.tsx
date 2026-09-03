@@ -10,9 +10,9 @@ import { Card } from "@/components/ui/card";
 
 const filters = [
   { label: "全部", match: () => true },
-  { label: "待审批", match: (s: RequestStatus) => s === "PENDING_APPROVAL" },
-  { label: "冷静期", match: (s: RequestStatus) => s === "COOLING_OFF" },
-  { label: "已完成", match: (s: RequestStatus) => s === "PURCHASED" || s === "GIVEN_UP" },
+  { label: "等回应", match: (s: RequestStatus) => s === "PENDING_APPROVAL" },
+  { label: "冷静中", match: (s: RequestStatus) => s === "COOLING_OFF" },
+  { label: "有结果", match: (s: RequestStatus) => s === "PURCHASED" || s === "GIVEN_UP" },
 ] as const;
 
 export default function Requests() {
@@ -25,8 +25,8 @@ export default function Requests() {
   if (!ready) {
     return (
       <>
-        <h1 className="text-3xl font-bold">购买记录</h1>
-        <p className="mt-2 text-[var(--muted)]">每一次认真考虑，都算数。</p>
+        <h1 className="text-3xl font-black">我的想买记录</h1>
+        <p className="mt-2 text-[var(--muted)]">每一次心动、纠结和拔草，都算数。</p>
         <div className="mt-12 text-center text-sm text-[var(--muted)]">加载中…</div>
       </>
     );
@@ -34,8 +34,8 @@ export default function Requests() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold">购买记录</h1>
-      <p className="mt-2 text-[var(--muted)]">每一次认真考虑，都算数。</p>
+      <h1 className="text-3xl font-black">我的想买记录</h1>
+      <p className="mt-2 text-[var(--muted)]">每一次心动、纠结和拔草，都算数。</p>
 
       <div className="mt-6 flex gap-2 overflow-auto pb-2">
         {filters.map((f, i) => (
