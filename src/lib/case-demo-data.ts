@@ -45,6 +45,7 @@ export type DemoTestimony = {
   content: string;
   parentId?: string;
   createdAt: string;
+  likeCount?: number;
 };
 
 // ── 演示案件数据 ──
@@ -52,9 +53,9 @@ export const demoCases: ShoppingCase[] = [
   {
     caseId: "dc1",
     caseNumber: "DD-2026-0826",
-    title: "《关于我试图用买东西改变人生的申请》",
-    caseReason: "想用智能水杯养成喝水习惯",
-    statement: "普通杯子不会提醒我喝水，所以我一直不喝水。买了这个智能杯，我应该就能成为健康的人。",
+    title: "《买了这个杯子，我就会成为爱喝水的人》",
+    caseReason: "试图花钱雇一个杯子监督自己喝水",
+    statement: "普通杯子只是容器，这个杯子会发光提醒我。虽然家里已有 7 个杯子，但它们都没有上进心。",
     evidence: [
       { type: "HAS_SIMILAR_ITEM", text: "家里已有 7 个杯子" },
       { type: "NEW_DESIRE", text: "购物欲产生于 43 分钟前" },
@@ -84,9 +85,9 @@ export const demoCases: ShoppingCase[] = [
   {
     caseId: "dc2",
     caseNumber: "DD-2026-0715",
-    title: "《只要买下它，我就会开始运动》",
-    caseReason: "相信买了跑步机就会开始跑步",
-    statement: "每次路过健身房都觉得浪费钱，如果家里有跑步机，我就没有借口了吧。而且这个颜色和客厅很配。",
+    title: "《申请给晾衣服买一台跑步机》",
+    caseReason: "坚信贵一点的衣架能顺便让人运动",
+    statement: "我承认瑜伽垫现在负责垫桌脚，但跑步机不一样。它面积更大，应该足以承载我的健身决心。",
     evidence: [
       { type: "HAS_SIMILAR_ITEM", text: "家里有瑜伽垫（已用来垫桌脚）" },
       { type: "NEW_DESIRE", text: "购物欲产生于昨晚刷短视频" },
@@ -114,9 +115,9 @@ export const demoCases: ShoppingCase[] = [
   {
     caseId: "dc3",
     caseNumber: "DD-2026-0601",
-    title: "《这不是冲动，是限时优惠先动的手》",
-    caseReason: "限时折扣太诱人",
-    statement: "原价 1299 的降噪耳机降到 899，这个折扣不买等于亏钱。而且每天地铁通勤 1.5 小时，真的很需要一个安静的角落。",
+    title: "《不买立省 899，买了立省 400，到底谁更省》",
+    caseReason: "被商家的数学题绕进去了",
+    statement: "耳机原价 1299，现在只要 899。客服说我省了 400，但银行卡说我花了 899，请陪审团统一一下口径。",
     evidence: [
       { type: "LIMITED_PROMOTION", text: "限时优惠还剩 6 小时" },
       { type: "LONG_CONSIDERATION", text: "已经关注了两周" },
@@ -145,9 +146,9 @@ export const demoCases: ShoppingCase[] = [
   {
     caseId: "dc4",
     caseNumber: "DD-2026-0520",
-    title: "《买了不一定快乐，不买今晚肯定惦记》",
-    caseReason: "纠结一晚上了",
-    statement: "这个香薰蜡烛套装看起来太治愈了，睡前点一会儿整个房间都会变温柔。但又觉得上次买的还没拆……",
+    title: "《家里已有三个香薰，但这个叫“停止内耗”》",
+    caseReason: "试图用第四个香薰解决前三个没解决的问题",
+    statement: "前面三个分别叫好运、松弛和暴富，都还没拆。这个新款叫停止内耗，我觉得它是来结束这个局面的。",
     evidence: [
       { type: "HAS_SIMILAR_ITEM", text: "家里有 3 个未拆封香薰" },
       { type: "BUDGET_COMFORTABLE", text: "本月预算比较宽松" },
@@ -178,9 +179,9 @@ export const demoCases: ShoppingCase[] = [
   {
     caseId: "dc5",
     caseNumber: "DD-2026-0488",
-    title: "《我的闺蜜劝我别买，所以申请社会评议》",
-    caseReason: "闺蜜劝不住，请网友帮忙",
-    statement: "这个降噪耳机闺蜜说家里有了别买，但这个牌子不一样！降噪效果完全不同！而且颜色也不一样！",
+    title: "《闺蜜已驳回，现申请互联网二审》",
+    caseReason: "一审没通过，试图更换陪审团",
+    statement: "闺蜜说我已经有耳机了。但旧的是米白，新的是燕麦白，这是两个完全不同的生活阶段，请互联网明察。",
     evidence: [
       { type: "HAS_SIMILAR_ITEM", text: "家里有一副普通耳机" },
       { type: "NEW_DESIRE", text: "购物欲产生于 2 小时前" },
@@ -438,13 +439,17 @@ export const demoCases: ShoppingCase[] = [
 
 // ── 演示证词 ──
 export const demoTestimonies: DemoTestimony[] = [
-  { id: "t1", caseId: "dc1", role: "EVIDENCE_PROVIDER", author: "栗子", emoji: "🌰", content: "姐妹，你缺的可能不是杯子，是接水。", createdAt: "1 小时前" },
-  { id: "t2", caseId: "dc1", role: "SAME_ITEM_OWNER", author: "阿鹿", emoji: "🦌", content: "我买了同款，用了一周就开始积灰。提醒功能确实有用，但三天后我就关了。", createdAt: "45 分钟前" },
-  { id: "t3", caseId: "dc1", role: "DEFENSE", author: "晚风", emoji: "🍃", content: "说实话智能杯确实比普通杯更能培养习惯，灯光提醒比手机通知管用。", createdAt: "30 分钟前" },
-  { id: "t4", caseId: "dc2", role: "COOLING_ADVISER", author: "桃子汽水", emoji: "🍑", content: "建议先去楼下公园跑七天，如果七天后还想买跑步机，再考虑。", createdAt: "2 小时前" },
-  { id: "t5", caseId: "dc2", role: "EVIDENCE_PROVIDER", author: "栗子", emoji: "🌰", content: "关键证据：当事人瑜伽垫已用来垫桌脚。", createdAt: "1 小时前" },
+  { id: "t1", caseId: "dc1", role: "EVIDENCE_PROVIDER", author: "栗子", emoji: "🌰", content: "姐妹，你缺的可能不是杯子，是接水。", createdAt: "1 小时前", likeCount: 38 },
+  { id: "t2", caseId: "dc1", role: "SAME_ITEM_OWNER", author: "阿鹿", emoji: "🦌", content: "同款买家作证：第三天我嫌它老催我，把提醒关了。", createdAt: "45 分钟前", likeCount: 21 },
+  { id: "t3", caseId: "dc1", role: "DEFENSE", author: "晚风", emoji: "🍃", content: "准买，但旧杯子必须组团出道，不能继续在柜子里待机。", createdAt: "30 分钟前", likeCount: 16 },
+  { id: "t4", caseId: "dc2", role: "COOLING_ADVISER", author: "桃子汽水", emoji: "🍑", content: "建议先去楼下跑七天。毕竟公园不会分期，跑不动也不会占客厅。", createdAt: "2 小时前", likeCount: 46 },
+  { id: "t5", caseId: "dc2", role: "EVIDENCE_PROVIDER", author: "栗子", emoji: "🌰", content: "关键证据：当事人的瑜伽垫目前任职桌脚稳定专员。", createdAt: "1 小时前", likeCount: 33 },
   { id: "t6", caseId: "dc3", role: "PURCHASED_USER", author: "小满", emoji: "🌸", content: "同款通勤用了一年，每天那个安静的 30 分钟是属于自己的时间。", createdAt: "3 小时前" },
   { id: "t7", caseId: "dc3", role: "ALTERNATIVE_SCOUT", author: "阿鹿", emoji: "🦌", content: "推荐试试 200 出头的入耳式降噪，效果差距不大但价格友好很多。", createdAt: "2 小时前" },
+  { id: "t11", caseId: "dc4", role: "EVIDENCE_PROVIDER", author: "小满", emoji: "🌸", content: "申请驳回。真正停止内耗的方式是停止打开购物软件。", createdAt: "50 分钟前", likeCount: 52 },
+  { id: "t12", caseId: "dc4", role: "DEFENSE", author: "阿鹿", emoji: "🦌", content: "建议先把“暴富”拆了，万一它只是还没来得及生效。", createdAt: "32 分钟前", likeCount: 41 },
+  { id: "t13", caseId: "dc5", role: "EVIDENCE_PROVIDER", author: "栗子", emoji: "🌰", content: "本庭认为燕麦白和米白的主要区别，是前者多收你一千块。", createdAt: "25 分钟前", likeCount: 67 },
+  { id: "t14", caseId: "dc5", role: "DEFENSE", author: "桃子汽水", emoji: "🍑", content: "支持二审，但建议把旧耳机请来出庭对质。", createdAt: "12 分钟前", likeCount: 29 },
   { id: "t8", caseId: "dc5", role: "PURCHASED_USER", author: "小满", emoji: "🌸", content: "同款用了一周，通勤幸福感直线上升！每天那个安静的 30 分钟就是属于自己的时间。", createdAt: "5 天前" },
   { id: "t9", caseId: "dc6", role: "PURCHASED_USER", author: "桃子汽水", emoji: "🍑", content: "用了一次之后开始积灰，清洗太麻烦了，简直是当代最鸡肋厨房电器。", createdAt: "一周前" },
   { id: "t10", caseId: "dc7", role: "ALTERNATIVE_SCOUT", author: "小满", emoji: "🌸", content: "推荐一个平替款，颜色几乎一模一样，价格只要三分之一，用了两个月质感依然很好！", createdAt: "两周前" },

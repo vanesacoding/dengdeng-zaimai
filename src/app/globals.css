@@ -11,4 +11,9 @@ body { margin: 0; background: var(--cream); color: var(--ink); font-family: Aria
 button, input, textarea, select { font: inherit; }
 .safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 .mood-chip { display:inline-flex; max-width:8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:999px; background:var(--lemon-soft); padding:.2rem .55rem; color:#67560f; font-size:.68rem; font-weight:600; }
+.app-main { font-size: 13px; line-height: 1.5; }
+.app-main h1 { font-size: 1.25rem !important; line-height: 1.28 !important; letter-spacing: -.02em; }
+.app-main h2 { font-size: .925rem !important; line-height: 1.4 !important; }
+.app-main h3 { font-size: .875rem !important; line-height: 1.4 !important; }
+.app-main input, .app-main textarea, .app-main select { font-size: 16px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; animation-iteration-count:1!important; } }
