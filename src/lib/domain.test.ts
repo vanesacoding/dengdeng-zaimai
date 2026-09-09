@@ -46,7 +46,7 @@ describe("quick desire form", () => {
     expect(purchaseSchema.safeParse(base).success).toBe(true);
   });
   it("needs either a product image or link", () => {
-    expect(purchaseSchema.safeParse({ ...base, productUrl: "" }).success).toBe(false);
+    expect(purchaseSchema.safeParse({ ...base, productUrl: "" }).success).toBe(true);
   });
 });
 

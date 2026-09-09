@@ -18,6 +18,13 @@ import type { z } from "zod";
 
 type Form = z.input<typeof purchaseSchema>;
 
+function timeout<T>(promise: Promise<T>, milliseconds = 4000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => window.setTimeout(() => reject(new Error("AI_TIMEOUT")), milliseconds)),
+  ]);
+}
+
 export default function NewRequest() {
   const router = useRouter();
   const { add } = useRequests();
@@ -27,6 +34,7 @@ export default function NewRequest() {
   const [statement, setStatement] = useState("");
   const [generating, setGenerating] = useState(false);
   const [writerNote, setWriterNote] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const { register, handleSubmit, control, getValues, trigger, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(purchaseSchema),
     defaultValues: { itemName: "", priceYuan: "" as unknown as number, reason: "", category: "其他", mood: "SEEDED_BY_OTHERS", visibility: "FRIENDS", productUrl: "", imageUrl: "", desiredHours: 0, coolingEnabled: true, coolingHours: 24, countInBudget: true, hasSimilarItem: false, limitedPromotion: false, plannedPurchase: false, necessity: false },
@@ -34,6 +42,7 @@ export default function NewRequest() {
   const visibility = useWatch({ control, name: "visibility" });
 
   function submit(data: Form) {
+    setSubmitError("");
     const priceCents = yuanToCents(Number(data.priceYuan));
     const risk = calculateRisk({ priceCents, remainingCents: demoBudget.remainingAmount, safeBalanceCents: demoBudget.safeBalance, hasSimilarItem: false, desiredHours: 0, limitedPromotion: false, plannedPurchase: false, necessity: false });
     add({ id: crypto.randomUUID(), itemName: data.itemName, priceCents, category: data.category, reason: data.reason, status: "PENDING_APPROVAL", riskScore: risk.score, createdAt: "刚刚", reviewer: "闺蜜", mood: data.mood, visibility: data.visibility, caseTitle: data.visibility === "PUBLIC" ? selectedTitle : undefined, caseStatement: data.visibility === "PUBLIC" ? statement : undefined });
@@ -49,7 +58,7 @@ export default function NewRequest() {
     try {
       const supabase = createClient();
       if (supabase) {
-        const response = await supabase.functions.invoke("case-writer", { body: input });
+        const response = await timeout(supabase.functions.invoke("case-writer", { body: input }));
         if (!response.error && isCaseWriterResult(response.data)) result = response.data;
       }
     } catch { /* fall back to the local demo writer */ }
@@ -62,7 +71,7 @@ export default function NewRequest() {
 
   return <>
     <header><p className="text-[11px] text-[var(--muted)]">发起审批</p><h1 className="mt-0.5 font-black">我想买这个</h1></header>
-    <form onSubmit={handleSubmit(submit)} className="mt-5 space-y-4">
+    <form onSubmit={handleSubmit(submit, () => setSubmitError("还有内容没填好，请看看上面的提示。"))} className="mt-5 space-y-4">
       <Field label="买什么？" error={errors.itemName?.message}><Input {...register("itemName")} placeholder="例如：降噪耳机"/></Field>
       <Field label="多少钱？" error={errors.priceYuan?.message}><div className="relative"><span className="absolute left-3 top-3 text-sm font-bold">¥</span><Input {...register("priceYuan")} className="pl-8" type="number" inputMode="decimal" placeholder="0.00"/></div></Field>
       <Field label="为什么想买？" error={errors.reason?.message}><Textarea {...register("reason")} rows={3} placeholder="一句话说清楚就好……"/></Field>
@@ -73,10 +82,12 @@ export default function NewRequest() {
         {draft && <div className="mt-3 space-y-2">
           <p className="text-[11px] font-semibold">选一个案名</p>
           {draft.caseTitles.map(title => <button type="button" key={title} onClick={() => setSelectedTitle(title)} className={`flex min-h-10 w-full items-center gap-2 rounded-xl border px-3 text-left text-[12px] ${selectedTitle === title ? "border-[var(--forest)] bg-[var(--sage-soft)] text-[var(--forest)]" : "border-[var(--line)]"}`}><span className="w-3">{selectedTitle === title && <Check size={13}/>}</span>{title}</button>)}
+          <label className="block pt-1"><span className="mb-1.5 block text-[11px] font-semibold">案名（可修改）</span><Input value={selectedTitle} onChange={event => setSelectedTitle(event.target.value)} maxLength={40}/></label>
           <label className="block pt-1"><span className="mb-1.5 block text-[11px] font-semibold">案情描述（可修改）</span><Textarea value={statement} onChange={event => setStatement(event.target.value)} rows={3}/></label>
           {writerNote && <p className="text-[10px] leading-4 text-[var(--muted)]">{writerNote}</p>}
         </div>}
       </section>}
+      {submitError && <p role="alert" className="rounded-xl bg-[#fce8e3] px-3 py-2 text-[11px] text-[#9d3b2b]">{submitError}</p>}
       <Button type="submit" className="mt-2 w-full"><Send size={15}/>提交</Button>
       <p className="text-center text-[10px] text-[var(--muted)]">朋友和网友的意见都只是参考</p>
     </form>

@@ -474,4 +474,4 @@ export const purchaseSchema = z.object({
   desiredHours: z.coerce.number().min(0).default(0), limitedPromotion: z.boolean().default(false), plannedPurchase: z.boolean().default(false), necessity: z.boolean().default(false),
   coolingEnabled: z.boolean().default(true), coolingHours: z.coerce.number().min(0).max(720).default(24), countInBudget: z.boolean().default(true),
   mood: z.enum(moods).default("SEEDED_BY_OTHERS"), visibility: z.enum(visibilities).default("FRIENDS")
-}).refine(v => Boolean(v.productUrl || v.imageUrl), { message:"添加一张商品图或商品链接吧", path:["productUrl"] });
+});

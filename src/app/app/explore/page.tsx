@@ -1,17 +1,15 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, MessageCircle, ThumbsDown, ThumbsUp, Timer } from "lucide-react";
 import { demoCases } from "@/lib/case-demo-data";
 import { formatMoney } from "@/lib/utils";
 
-type Vote = "buy" | "wait" | "skip";
 const tabs = [{ key: "hot", label: "热门" }, { key: "new", label: "最新" }] as const;
 
 export default function ExplorePage() {
   const [active, setActive] = useState<(typeof tabs)[number]["key"]>("hot");
-  const [votes, setVotes] = useState<Record<string, Vote>>({});
   const cases = useMemo(() => active === "hot" ? demoCases.slice(0, 5) : [...demoCases].reverse().slice(0, 5), [active]);
 
   return <>
@@ -24,7 +22,6 @@ export default function ExplorePage() {
     </div>
     <div className="mt-3 space-y-3">
       {cases.map(caseData => {
-        const selected = votes[caseData.caseId];
         return <article key={caseData.caseId} className="rounded-2xl border border-[var(--line)] bg-white p-3.5 shadow-[0_3px_12px_rgba(28,50,36,.04)]">
           <div className="flex items-center gap-2 text-[11px] text-[var(--muted)]"><span className="grid size-6 place-items-center rounded-full bg-[var(--sage-soft)]">{caseData.userEmoji}</span><b className="text-[var(--ink)]">{caseData.isAnonymous ? "匿名" : caseData.user}</b><span>· {caseData.createdAt}</span></div>
           <Link href={`/app/explore/${caseData.caseId}`} className="mt-2.5 flex gap-3">
@@ -32,9 +29,9 @@ export default function ExplorePage() {
             <div className={`grid size-[68px] shrink-0 place-items-center rounded-xl ${caseData.tint} text-3xl`}>{caseData.itemEmoji}</div>
           </Link>
           <div className="mt-3 flex items-center gap-1.5">
-            <VoteButton active={selected === "buy"} onClick={() => setVotes(v => ({ ...v, [caseData.caseId]: "buy" }))} icon={<ThumbsUp size={13}/>} label="可以买" />
-            <VoteButton active={selected === "wait"} onClick={() => setVotes(v => ({ ...v, [caseData.caseId]: "wait" }))} icon={<Timer size={13}/>} label="等等" />
-            <VoteButton active={selected === "skip"} onClick={() => setVotes(v => ({ ...v, [caseData.caseId]: "skip" }))} icon={<ThumbsDown size={13}/>} label="别买" />
+            <VoteCount icon={<ThumbsUp size={12}/>} label="可以买" count={caseData.voteCounts.WORTH_IT}/>
+            <VoteCount icon={<Timer size={12}/>} label="等等" count={caseData.voteCounts.WAIT}/>
+            <VoteCount icon={<ThumbsDown size={12}/>} label="别买" count={caseData.voteCounts.RUN_AWAY}/>
             <Link href={`/app/explore/${caseData.caseId}#comments`} className="ml-auto flex min-h-8 items-center gap-1 px-1 text-[11px] text-[var(--muted)]"><MessageCircle size={14}/> {caseData.commentCount}</Link>
             <Link href={`/app/explore/${caseData.caseId}`} aria-label="查看详情" className="grid size-8 place-items-center text-[var(--muted)]"><ChevronRight size={15}/></Link>
           </div>
@@ -45,6 +42,6 @@ export default function ExplorePage() {
   </>;
 }
 
-function VoteButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: ReactNode; label: string }) {
-  return <button type="button" onClick={onClick} className={`flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium ${active ? "bg-[var(--forest)] text-white" : "bg-[var(--cream)] text-[var(--muted)]"}`}>{icon}{label}</button>;
+function VoteCount({ icon, label, count }: { icon: React.ReactNode; label: string; count: number }) {
+  return <span className="flex min-h-8 items-center gap-1 rounded-full bg-[var(--cream)] px-2 text-[10px] text-[var(--muted)]">{icon}<span>{label}</span><b className="text-[var(--ink)]">{count}</b></span>;
 }
