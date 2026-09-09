@@ -12,7 +12,9 @@ const corsHeaders = {
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const token = request.headers.get("Authorization");
+    // 新版 supabase-js 匿名调用只发 apikey 头不发 Authorization（sb_publishable 新格式 key），
+    // 这里两者都接受，保证未登录访客也能用书记员
+    const token = request.headers.get("Authorization") || (request.headers.get("apikey") ? `Bearer ${request.headers.get("apikey")}` : null);
     if (!token) return json({ error: "请先登录" }, 401);
 
     const { itemName, priceYuan, originalReason, tone = "light" } = await request.json();
@@ -41,6 +43,8 @@ Deno.serve(async (request) => {
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
+        // 关闭深度思考：购物案文案不需要长推理，开启时生成要 30~60 秒会触发前端超时
+        thinking: { type: "disabled" },
       }),
     });
     const result = await response.json();
