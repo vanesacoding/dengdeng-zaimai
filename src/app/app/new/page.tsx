@@ -20,7 +20,7 @@ import type { z } from "zod";
 type Form = z.input<typeof purchaseSchema>;
 const toneOrder: CaseWriterTone[] = ["dramatic", "light", "official"];
 
-function timeout<T>(promise: Promise<T>, milliseconds = 4000): Promise<T> {
+function timeout<T>(promise: Promise<T>, milliseconds = 30000): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => window.setTimeout(() => reject(new Error("AI_TIMEOUT")), milliseconds)),
