@@ -47,7 +47,7 @@ export default function NewRequest() {
     const priceCents = yuanToCents(Number(data.priceYuan));
     const risk = calculateRisk({ priceCents, remainingCents: demoBudget.remainingAmount, safeBalanceCents: demoBudget.safeBalance, hasSimilarItem: false, desiredHours: 0, limitedPromotion: false, plannedPurchase: false, necessity: false });
     add({ id: crypto.randomUUID(), itemName: data.itemName, priceCents, category: data.category, reason: data.reason, status: "PENDING_APPROVAL", riskScore: risk.score, createdAt: "刚刚", reviewer: "闺蜜", mood: data.mood, visibility: data.visibility, caseTitle: data.visibility === "PUBLIC" ? selectedTitle : undefined, caseStatement: data.visibility === "PUBLIC" ? statement : undefined });
-    router.push("/app/requests/submitted");
+    router.push(`/app/requests/submitted?target=${data.visibility === "PUBLIC" ? "court" : "friend"}`);
   }
 
   async function writeCase(nextTone: CaseWriterTone = tone) {
