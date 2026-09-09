@@ -161,3 +161,32 @@ describe("visibility labels", () => {
     expect(visibilityLabel.PUBLIC).toBe("发到想买广场");
   });
 });
+
+describe("hasAlternative radio 兼容（react-hook-form 对 radio 不应用 setValueAs，提交的是字符串）", () => {
+  const base = { itemName: "降噪耳机", priceYuan: "999", category: "其他", reason: "通勤太吵想安静" };
+  it("radio 字符串 \"true\" 转为 true", () => {
+    const r = purchaseSchema.safeParse({ ...base, hasAlternative: "true" });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.hasAlternative).toBe(true);
+  });
+  it("radio 字符串 \"false\" 转为 false", () => {
+    const r = purchaseSchema.safeParse({ ...base, hasAlternative: "false" });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.hasAlternative).toBe(false);
+  });
+  it("布尔值原样通过；缺省 undefined 走 default false", () => {
+    const t = purchaseSchema.safeParse({ ...base, hasAlternative: true });
+    if (t.success) expect(t.data.hasAlternative).toBe(true); else throw new Error("fail");
+    const d = purchaseSchema.safeParse(base);
+    expect(d.success).toBe(true);
+    if (d.success) expect(d.data.hasAlternative).toBe(false);
+  });
+  it("完整表单（模拟用户全部填完）提交通过", () => {
+    const r = purchaseSchema.safeParse({
+      ...base, mood: "SEEDED_BY_OTHERS", visibility: "FRIENDS", productUrl: "", imageUrl: "",
+      desiredHours: 0, coolingEnabled: true, coolingHours: 24, countInBudget: true,
+      hasSimilarItem: false, hasAlternative: "true", limitedPromotion: false, plannedPurchase: false, necessity: false,
+    });
+    expect(r.success).toBe(true);
+  });
+});

@@ -470,7 +470,9 @@ export const purchaseSchema = z.object({
   itemName: z.string().trim().min(2,"请填写至少 2 个字"), priceYuan: z.coerce.number().positive("价格必须大于 0"),
   category: z.string().min(1), reason: z.string().trim().min(4,"再多说一点点吧（至少 4 个字）"), reviewerId: z.string().uuid().optional(),
   productUrl: z.string().url("链接格式好像不太对").or(z.literal("")).optional(), imageUrl: z.string().url().or(z.literal("")).optional(),
-  impactIfNotPurchased: z.string().optional(), hasSimilarItem: z.boolean().default(false), hasAlternative: z.boolean().default(false),
+  impactIfNotPurchased: z.string().optional(), hasSimilarItem: z.boolean().default(false),
+  // 单选按钮（radio）提交的是字符串 "true"/"false"（react-hook-form 对 radio 不应用 setValueAs），这里一并兼容并转回布尔值
+  hasAlternative: z.union([z.boolean(), z.literal("true"), z.literal("false")]).transform(v => v === true || v === "true").default(false),
   desiredHours: z.coerce.number().min(0).default(0), limitedPromotion: z.boolean().default(false), plannedPurchase: z.boolean().default(false), necessity: z.boolean().default(false),
   coolingEnabled: z.boolean().default(true), coolingHours: z.coerce.number().min(0).max(720).default(24), countInBudget: z.boolean().default(true),
   mood: z.enum(moods).default("SEEDED_BY_OTHERS"), visibility: z.enum(visibilities).default("FRIENDS")
