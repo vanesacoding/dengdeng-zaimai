@@ -9,4 +9,12 @@ describe("case writer", () => {
     expect(result.caseStatement).toContain("最近加班");
     expect(isCaseWriterResult(result)).toBe(true);
   });
+
+  it("changes the statement when the tone changes", () => {
+    const input = { itemName: "空气炸锅", priceYuan: 399, originalReason: "想学做饭" };
+    const dramatic = createLocalCaseDraft({ ...input, tone: "dramatic" });
+    const light = createLocalCaseDraft({ ...input, tone: "light" });
+    expect(dramatic.caseStatement).not.toBe(light.caseStatement);
+    expect(dramatic.caseTitles).not.toEqual(light.caseTitles);
+  });
 });

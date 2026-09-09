@@ -17,6 +17,7 @@ import { Input, Textarea } from "@/components/ui/input";
 import type { z } from "zod";
 
 type Form = z.input<typeof purchaseSchema>;
+const toneOrder: CaseWriterTone[] = ["dramatic", "light", "official"];
 
 function timeout<T>(promise: Promise<T>, milliseconds = 4000): Promise<T> {
   return Promise.race([
@@ -28,7 +29,7 @@ function timeout<T>(promise: Promise<T>, milliseconds = 4000): Promise<T> {
 export default function NewRequest() {
   const router = useRouter();
   const { add } = useRequests();
-  const [tone, setTone] = useState<CaseWriterTone>("light");
+  const [tone, setTone] = useState<CaseWriterTone>("dramatic");
   const [draft, setDraft] = useState<CaseWriterResult>();
   const [selectedTitle, setSelectedTitle] = useState("");
   const [statement, setStatement] = useState("");
@@ -49,10 +50,10 @@ export default function NewRequest() {
     router.push("/app/requests/submitted");
   }
 
-  async function writeCase() {
+  async function writeCase(nextTone: CaseWriterTone = tone) {
     if (!await trigger(["itemName", "priceYuan", "reason"])) return;
     const values = getValues();
-    const input = { itemName: values.itemName, priceYuan: Number(values.priceYuan), originalReason: values.reason, tone };
+    const input = { itemName: values.itemName, priceYuan: Number(values.priceYuan), originalReason: values.reason, tone: nextTone };
     setGenerating(true); setWriterNote("");
     let result: CaseWriterResult | undefined;
     try {
@@ -69,6 +70,11 @@ export default function NewRequest() {
     setDraft(result); setSelectedTitle(result.caseTitles[0]); setStatement(result.caseStatement); setGenerating(false);
   }
 
+  function changeTone(nextTone: CaseWriterTone) {
+    setTone(nextTone);
+    if (draft) void writeCase(nextTone);
+  }
+
   return <>
     <header><p className="text-[11px] text-[var(--muted)]">发起审批</p><h1 className="mt-0.5 font-black">我想买这个</h1></header>
     <form onSubmit={handleSubmit(submit, () => setSubmitError("还有内容没填好，请看看上面的提示。"))} className="mt-5 space-y-4">
@@ -77,8 +83,8 @@ export default function NewRequest() {
       <Field label="为什么想买？" error={errors.reason?.message}><Textarea {...register("reason")} rows={3} placeholder="一句话说清楚就好……"/></Field>
       <Field label="给谁看？"><div className="grid grid-cols-2 gap-2"><Choice value="FRIENDS" label="给闺蜜审批" register={register}/><Choice value="PUBLIC" label="发到法庭" register={register}/></div></Field>
       {visibility === "PUBLIC" && <section className="rounded-2xl border border-[var(--line)] bg-white p-3.5">
-        <div className="flex items-center justify-between gap-3"><div><b className="text-[13px]">AI 书记员</b><p className="text-[11px] text-[var(--muted)]">把原话写成有梗的购物案</p></div><Button type="button" size="sm" onClick={writeCase} disabled={generating}>{generating ? <LoaderCircle className="animate-spin" size={14}/> : <Sparkles size={14}/>} {draft ? "换一批" : "帮我写"}</Button></div>
-        <div className="mt-3 flex gap-1.5">{(Object.keys(toneLabels) as CaseWriterTone[]).map(item => <button type="button" key={item} onClick={() => setTone(item)} className={`rounded-full px-2.5 py-1.5 text-[10px] ${tone === item ? "bg-[var(--forest)] text-white" : "bg-[var(--cream)] text-[var(--muted)]"}`}>{toneLabels[item]}</button>)}</div>
+        <div className="flex items-center justify-between gap-3"><div><b className="text-[13px]">AI 书记员</b><p className="text-[11px] text-[var(--muted)]">把原话写成有梗的购物案</p></div><Button type="button" size="sm" onClick={() => writeCase()} disabled={generating}>{generating ? <LoaderCircle className="animate-spin" size={14}/> : <Sparkles size={14}/>} {draft ? "换一批" : "帮我写"}</Button></div>
+        <div className="mt-3 flex gap-1.5">{toneOrder.map(item => <button type="button" key={item} disabled={generating} onClick={() => changeTone(item)} className={`rounded-full px-2.5 py-1.5 text-[10px] disabled:opacity-50 ${tone === item ? "bg-[var(--forest)] text-white" : "bg-[var(--cream)] text-[var(--muted)]"}`}>{toneLabels[item]}</button>)}</div>
         {draft && <div className="mt-3 space-y-2">
           <p className="text-[11px] font-semibold">选一个案名</p>
           {draft.caseTitles.map(title => <button type="button" key={title} onClick={() => setSelectedTitle(title)} className={`flex min-h-10 w-full items-center gap-2 rounded-xl border px-3 text-left text-[12px] ${selectedTitle === title ? "border-[var(--forest)] bg-[var(--sage-soft)] text-[var(--forest)]" : "border-[var(--line)]"}`}><span className="w-3">{selectedTitle === title && <Check size={13}/>}</span>{title}</button>)}

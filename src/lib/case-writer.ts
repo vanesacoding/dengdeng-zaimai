@@ -47,10 +47,15 @@ export function createLocalCaseDraft(input: CaseWriterInput): CaseWriterResult {
       `钱包诉${item}疑似冲动消费案`,
     ],
   };
+  const statements: Record<CaseWriterTone, string> = {
+    dramatic: `当事人因“${reason}”与${item}一见钟情，${priceText}。购物车已经敲响升堂鼓，现请陪审团紧急审理。`,
+    light: `当事人最近有个小小心愿：“${reason}。”${priceText}，想请大家帮忙看看，这次心动值不值得认真对待。`,
+    official: `经当事人陈述，购置${item}的主要理由为“${reason}”。${priceText}，现就本次支出的必要性提请评议。`,
+  };
 
   return {
     caseTitles: titles[input.tone],
-    caseStatement: `当事人陈述：“${reason}。”${priceText}，现提交陪审团评议。`,
+    caseStatement: statements[input.tone],
     oneLineSummary: `申请购入${item}，理由是${reason}`.slice(0, 38),
     tone: input.tone,
   };
