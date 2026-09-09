@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Clock3, MessageCircle, MoreHorizontal,
@@ -81,6 +82,8 @@ export function RequestDetail({ id }: { id: string }) {
         <b className="text-2xl">{formatMoney(r.priceCents)}</b>
       </div>
 
+      {r.imageUrl && <Image src={r.imageUrl} alt={r.itemName} width={640} height={416} unoptimized className="mt-5 h-52 w-full rounded-2xl object-cover"/>}
+
       {r.status === "COOLING_OFF" && (
         <Card className="mt-6 border-0 bg-[var(--orange-soft)]">
           <div className="flex gap-3">
@@ -96,6 +99,7 @@ export function RequestDetail({ id }: { id: string }) {
       <Card className="mt-6">
         <h2 className="font-bold">为什么想买</h2>
         <p className="mt-3 leading-7 text-[var(--muted)]">{r.reason}</p>
+        <p className="mt-3 text-xs text-[var(--muted)]">替代品：{r.hasAlternative ? "有" : "没有"}</p>
       </Card>
 
       <Card className="mt-4">

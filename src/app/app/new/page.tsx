@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, LoaderCircle, Send, Sparkles } from "lucide-react";
+import { Check, ImagePlus, LoaderCircle, Send, Sparkles, X } from "lucide-react";
 import { purchaseSchema } from "@/lib/domain";
 import { calculateRisk } from "@/lib/risk";
 import { demoBudget } from "@/lib/mock-data";
@@ -36,9 +37,11 @@ export default function NewRequest() {
   const [generating, setGenerating] = useState(false);
   const [writerNote, setWriterNote] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageError, setImageError] = useState("");
   const { register, handleSubmit, control, getValues, trigger, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(purchaseSchema),
-    defaultValues: { itemName: "", priceYuan: "" as unknown as number, reason: "", category: "其他", mood: "SEEDED_BY_OTHERS", visibility: "FRIENDS", productUrl: "", imageUrl: "", desiredHours: 0, coolingEnabled: true, coolingHours: 24, countInBudget: true, hasSimilarItem: false, limitedPromotion: false, plannedPurchase: false, necessity: false },
+    defaultValues: { itemName: "", priceYuan: "" as unknown as number, reason: "", category: "其他", mood: "SEEDED_BY_OTHERS", visibility: "FRIENDS", productUrl: "", imageUrl: "", desiredHours: 0, coolingEnabled: true, coolingHours: 24, countInBudget: true, hasSimilarItem: false, hasAlternative: false, limitedPromotion: false, plannedPurchase: false, necessity: false },
   });
   const visibility = useWatch({ control, name: "visibility" });
 
@@ -46,7 +49,7 @@ export default function NewRequest() {
     setSubmitError("");
     const priceCents = yuanToCents(Number(data.priceYuan));
     const risk = calculateRisk({ priceCents, remainingCents: demoBudget.remainingAmount, safeBalanceCents: demoBudget.safeBalance, hasSimilarItem: false, desiredHours: 0, limitedPromotion: false, plannedPurchase: false, necessity: false });
-    add({ id: crypto.randomUUID(), itemName: data.itemName, priceCents, category: data.category, reason: data.reason, status: "PENDING_APPROVAL", riskScore: risk.score, createdAt: "刚刚", reviewer: "闺蜜", mood: data.mood, visibility: data.visibility, caseTitle: data.visibility === "PUBLIC" ? selectedTitle : undefined, caseStatement: data.visibility === "PUBLIC" ? statement : undefined });
+    add({ id: crypto.randomUUID(), itemName: data.itemName, priceCents, category: data.category, reason: data.reason, status: "PENDING_APPROVAL", riskScore: risk.score, createdAt: "刚刚", reviewer: "闺蜜", mood: data.mood, visibility: data.visibility, imageUrl: imagePreview || undefined, hasAlternative: data.hasAlternative, caseTitle: data.visibility === "PUBLIC" ? selectedTitle : undefined, caseStatement: data.visibility === "PUBLIC" ? statement : undefined });
     router.push(`/app/requests/submitted?target=${data.visibility === "PUBLIC" ? "court" : "friend"}`);
   }
 
@@ -75,12 +78,27 @@ export default function NewRequest() {
     if (draft) void writeCase(nextTone);
   }
 
+  function selectImage(file?: File) {
+    setImageError("");
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setImageError("请选择图片文件");
+    if (file.size > 2 * 1024 * 1024) return setImageError("图片请控制在 2MB 以内");
+    const reader = new FileReader();
+    reader.onload = () => setImagePreview(String(reader.result));
+    reader.readAsDataURL(file);
+  }
+
   return <>
     <header><p className="text-[11px] text-[var(--muted)]">发起审批</p><h1 className="mt-0.5 font-black">我想买这个</h1></header>
     <form onSubmit={handleSubmit(submit, () => setSubmitError("还有内容没填好，请看看上面的提示。"))} className="mt-5 space-y-4">
       <Field label="买什么？" error={errors.itemName?.message}><Input {...register("itemName")} placeholder="例如：降噪耳机"/></Field>
       <Field label="多少钱？" error={errors.priceYuan?.message}><div className="relative"><span className="absolute left-3 top-3 text-sm font-bold">¥</span><Input {...register("priceYuan")} className="pl-8" type="number" inputMode="decimal" placeholder="0.00"/></div></Field>
       <Field label="为什么想买？" error={errors.reason?.message}><Textarea {...register("reason")} rows={3} placeholder="一句话说清楚就好……"/></Field>
+      <Field label="是否有替代品？"><div className="grid grid-cols-2 gap-2"><BooleanChoice value="false" label="没有" name="hasAlternative" register={register}/><BooleanChoice value="true" label="有" name="hasAlternative" register={register}/></div></Field>
+      <Field label="商品图片（选填）">
+        {imagePreview ? <div className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-white"><Image src={imagePreview} alt="商品预览" width={640} height={352} unoptimized className="h-44 w-full object-cover"/><button type="button" aria-label="删除图片" onClick={() => setImagePreview("")} className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-black/60 text-white"><X size={15}/></button></div> : <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--line)] bg-white text-[11px] text-[var(--muted)]"><ImagePlus size={22}/><span className="mt-1">上传商品图片</span><input type="file" accept="image/*" className="sr-only" onChange={event => selectImage(event.target.files?.[0])}/></label>}
+        {imageError && <span className="mt-1 block text-[11px] text-red-600">{imageError}</span>}
+      </Field>
       <Field label="给谁看？"><div className="grid grid-cols-2 gap-2"><Choice value="FRIENDS" label="给闺蜜审批" register={register}/><Choice value="PUBLIC" label="发到法庭" register={register}/></div></Field>
       {visibility === "PUBLIC" && <section className="rounded-2xl border border-[var(--line)] bg-white p-3.5">
         <div className="flex items-center justify-between gap-3"><div><b className="text-[13px]">AI 书记员</b><p className="text-[11px] text-[var(--muted)]">把原话写成有梗的购物案</p></div><Button type="button" size="sm" onClick={() => writeCase()} disabled={generating}>{generating ? <LoaderCircle className="animate-spin" size={14}/> : <Sparkles size={14}/>} {draft ? "换一批" : "帮我写"}</Button></div>
@@ -102,6 +120,10 @@ export default function NewRequest() {
 
 function Choice({ value, label, register }: { value: "FRIENDS" | "PUBLIC"; label: string; register: ReturnType<typeof useForm<Form>>["register"] }) {
   return <label><input type="radio" value={value} {...register("visibility")} className="peer sr-only"/><span className="flex min-h-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-xs peer-checked:border-[var(--forest)] peer-checked:bg-[var(--sage-soft)] peer-checked:font-semibold peer-checked:text-[var(--forest)]">{label}</span></label>;
+}
+
+function BooleanChoice({ value, label, name, register }: { value: "true" | "false"; label: string; name: "hasAlternative"; register: ReturnType<typeof useForm<Form>>["register"] }) {
+  return <label><input type="radio" value={value} {...register(name, { setValueAs: input => input === "true" })} className="peer sr-only"/><span className="flex min-h-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-xs peer-checked:border-[var(--forest)] peer-checked:bg-[var(--sage-soft)] peer-checked:font-semibold peer-checked:text-[var(--forest)]">{label}</span></label>;
 }
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {

@@ -19,6 +19,7 @@ export interface PurchaseRequest {
   visibility?: RequestVisibility;
   productUrl?: string;
   imageUrl?: string;
+  hasAlternative?: boolean;
   caseTitle?: string;
   caseStatement?: string;
 }
@@ -43,6 +44,7 @@ function load(): PurchaseRequest[] {
         reviewer: String(r.reviewer ?? ""),
         productUrl: r.productUrl ? String(r.productUrl) : undefined,
         imageUrl: r.imageUrl ? String(r.imageUrl) : undefined,
+        hasAlternative: Boolean(r.hasAlternative),
         caseTitle: r.caseTitle ? String(r.caseTitle) : undefined,
         caseStatement: r.caseStatement ? String(r.caseStatement) : undefined,
         ...normalizeRequest(r),
