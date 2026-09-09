@@ -19,6 +19,8 @@ export interface PurchaseRequest {
   visibility?: RequestVisibility;
   productUrl?: string;
   imageUrl?: string;
+  caseTitle?: string;
+  caseStatement?: string;
 }
 
 const STORAGE_KEY = "ddzm:requests";
@@ -41,6 +43,8 @@ function load(): PurchaseRequest[] {
         reviewer: String(r.reviewer ?? ""),
         productUrl: r.productUrl ? String(r.productUrl) : undefined,
         imageUrl: r.imageUrl ? String(r.imageUrl) : undefined,
+        caseTitle: r.caseTitle ? String(r.caseTitle) : undefined,
+        caseStatement: r.caseStatement ? String(r.caseStatement) : undefined,
         ...normalizeRequest(r),
       })) as PurchaseRequest[];
     }

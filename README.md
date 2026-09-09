@@ -19,6 +19,15 @@ npm run dev
 
 打开 `http://localhost:3000`。不填写环境变量时进入演示模式，所有页面均可直接浏览。
 
+### AI 书记员
+
+选择“发到法庭”后，可以把用户原始购买理由生成三个案名和一段可编辑案情。本地未配置 AI 时会使用演示生成器；正式环境通过 Supabase Edge Function 调用 OpenAI，密钥不会暴露在浏览器中。
+
+```bash
+supabase secrets set OPENAI_API_KEY=你的密钥 OPENAI_MODEL=gpt-5-mini
+supabase functions deploy case-writer
+```
+
 ## 验证
 
 ```bash
