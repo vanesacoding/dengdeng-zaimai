@@ -1,16 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, MessageCircle, ThumbsDown, ThumbsUp, Timer } from "lucide-react";
-import { demoCases } from "@/lib/case-demo-data";
+import { useCourtCases } from "@/lib/my-cases";
 import { formatMoney } from "@/lib/utils";
 
 const tabs = [{ key: "hot", label: "热门" }, { key: "new", label: "最新" }] as const;
 
 export default function ExplorePage() {
   const [active, setActive] = useState<(typeof tabs)[number]["key"]>("hot");
-  const cases = useMemo(() => active === "hot" ? demoCases.slice(0, 5) : [...demoCases].reverse().slice(0, 5), [active]);
+  // 演示案件 + 用户自己提交的公开评审单（置顶）
+  const { cases: allCases, ready } = useCourtCases();
+  const cases = active === "hot" ? allCases.slice(0, 8) : [...allCases].reverse().slice(0, 8);
 
   return <>
     <header className="flex items-end justify-between gap-3">
@@ -21,10 +23,11 @@ export default function ExplorePage() {
       {tabs.map(tab => <button type="button" key={tab.key} onClick={() => setActive(tab.key)} className={`border-b-2 pb-2 text-[13px] font-semibold ${active === tab.key ? "border-[var(--forest)] text-[var(--forest)]" : "border-transparent text-[var(--muted)]"}`}>{tab.label}</button>)}
     </div>
     <div className="mt-3 space-y-3">
+      {!ready && <p className="py-6 text-center text-xs text-[var(--muted)]">载入中…</p>}
       {cases.map(caseData => {
         return <article key={caseData.caseId} className="rounded-2xl border border-[var(--line)] bg-white p-3.5 shadow-[0_3px_12px_rgba(28,50,36,.04)]">
           <div className="flex items-center gap-2 text-[11px] text-[var(--muted)]"><span className="grid size-6 place-items-center rounded-full bg-[var(--sage-soft)]">{caseData.userEmoji}</span><b className="text-[var(--ink)]">{caseData.isAnonymous ? "匿名" : caseData.user}</b><span>· {caseData.createdAt}</span></div>
-          <Link href={`/app/explore/${caseData.caseId}`} className="mt-2.5 flex gap-3">
+          <Link href={`/app/explore/case/?id=${caseData.caseId}`} className="mt-2.5 flex gap-3">
             <div className="min-w-0 flex-1"><h2 className="line-clamp-2 font-bold text-[14px] leading-5">{caseData.title.replaceAll("《", "").replaceAll("》", "")}</h2><p className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[var(--muted)]">{caseData.statement}</p><p className="mt-2 text-[13px] font-bold text-[var(--forest)]">{caseData.itemName} · {formatMoney(caseData.priceCents)}</p></div>
             <div className={`grid size-[68px] shrink-0 place-items-center rounded-xl ${caseData.tint} text-3xl`}>{caseData.itemEmoji}</div>
           </Link>
@@ -32,8 +35,8 @@ export default function ExplorePage() {
             <VoteCount icon={<ThumbsUp size={12}/>} label="可以买" count={caseData.voteCounts.WORTH_IT}/>
             <VoteCount icon={<Timer size={12}/>} label="等等" count={caseData.voteCounts.WAIT}/>
             <VoteCount icon={<ThumbsDown size={12}/>} label="别买" count={caseData.voteCounts.RUN_AWAY}/>
-            <Link href={`/app/explore/${caseData.caseId}#comments`} className="ml-auto flex min-h-8 items-center gap-1 px-1 text-[11px] text-[var(--muted)]"><MessageCircle size={14}/> {caseData.commentCount}</Link>
-            <Link href={`/app/explore/${caseData.caseId}`} aria-label="查看详情" className="grid size-8 place-items-center text-[var(--muted)]"><ChevronRight size={15}/></Link>
+            <Link href={`/app/explore/case/?id=${caseData.caseId}#comments`} className="ml-auto flex min-h-8 items-center gap-1 px-1 text-[11px] text-[var(--muted)]"><MessageCircle size={14}/> {caseData.commentCount}</Link>
+            <Link href={`/app/explore/case/?id=${caseData.caseId}`} aria-label="查看详情" className="grid size-8 place-items-center text-[var(--muted)]"><ChevronRight size={15}/></Link>
           </div>
         </article>;
       })}

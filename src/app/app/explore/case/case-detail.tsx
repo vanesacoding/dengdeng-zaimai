@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Heart, Send, ThumbsDown, ThumbsUp, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
-import { demoCases, demoTestimonies, type DemoTestimony } from "@/lib/case-demo-data";
+import { demoTestimonies, type DemoTestimony } from "@/lib/case-demo-data";
+import { useCourtCaseById } from "@/lib/my-cases";
 import { isSafeComment } from "@/lib/domain";
 import { formatMoney } from "@/lib/utils";
 
@@ -13,7 +14,8 @@ type Vote = "buy" | "wait" | "skip";
 const voteLabels: Record<Vote, string> = { buy: "可以买", wait: "等等", skip: "别买" };
 
 export function CaseDetail({ id }: { id: string }) {
-  const caseData = useMemo(() => demoCases.find(item => item.caseId === id), [id]);
+  // 优先在用户提交的公开单里找，找不到回落到演示案件
+  const { caseData, ready } = useCourtCaseById(id);
   const [vote, setVote] = useState<Vote>();
   const [comments, setComments] = useState<DemoTestimony[]>(demoTestimonies.filter(item => item.caseId === id));
   const [liked, setLiked] = useState<Record<string, boolean>>({});
@@ -29,6 +31,7 @@ export function CaseDetail({ id }: { id: string }) {
     }
   }, [id]);
 
+  if (!ready) return <div className="py-20 text-center"><p className="text-[var(--muted)]">载入中…</p></div>;
   if (!caseData) return <div className="py-20 text-center"><p className="text-[var(--muted)]">这个案件找不到了</p><Button asChild className="mt-4"><Link href="/app/explore">返回法庭</Link></Button></div>;
 
   function submitComment() {
